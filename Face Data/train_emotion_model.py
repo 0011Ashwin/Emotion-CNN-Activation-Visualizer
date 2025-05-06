@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
+# Model traning script for emotion recognition
 # Import the model architecture from our visualization script
 from visualize_activations import EmotionCNN
 

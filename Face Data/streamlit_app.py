@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from visualize_activations import ActivationMapVisualizer
 
+# Main streamlit ui web-app
 st.set_page_config(page_title="Emotion CNN Activation Visualizer", layout="wide")
 
 def main():

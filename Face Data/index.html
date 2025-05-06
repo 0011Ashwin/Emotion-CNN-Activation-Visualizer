@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion CNN Activation Maps Visualizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+        }
+        header {
+            background: #50a3a2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .main-content {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            display: inline-block;
+            background: #50a3a2;
+            color: white;
+            padding: 10px 20px;
+            margin: 15px 0;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #378685;
+        }
+        .highlight {
+            background-color: #e0f7fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
+    <script>
+        // Redirect to Streamlit app after 5 seconds
+        setTimeout(function() {
+            window.location.href = "http://localhost:8501";
+        }, 5000);
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Emotion CNN Activation Maps Visualizer</h1>
+    </header>
+    <div class="container">
+        <div class="main-content">
+            <h2>Welcome to the Emotion CNN Activation Maps Visualizer</h2>
+            <p>This tool helps you understand how Convolutional Neural Networks (CNNs) process facial emotion images. By visualizing activation maps, you can see which parts of the face are important for the model's classification decision.</p>
+            
+            <div class="highlight">
+                <p>You will be redirected to the Streamlit app in 5 seconds. If you are not redirected automatically, please click the button below.</p>
+                <a href="http://localhost:8501" class="btn">Launch Streamlit App</a>
+            </div>
+            
+            <h3>Features</h3>
+            <ul>
+                <li>Upload your own face images</li>
+                <li>Visualize Class Activation Maps (CAM)</li>
+                <li>Explore activation maps for different CNN layers</li>
+                <li>Adjust visualization settings</li>
+                <li>Use custom trained models</li>
+            </ul>
+            
+            <h3>How It Works</h3>
+            <p>The app uses a CNN model to analyze facial expressions and classify them into 7 emotion categories. It then visualizes the activation maps of different layers in the network to show which parts of the image are being focused on by the model.</p>
+            
+            <h3>Understanding Activation Maps</h3>
+            <p>Activation maps highlight regions of the input image that activate specific filters in the CNN. Warmer colors (red/yellow) indicate stronger activations, showing which parts of the face are most important for detecting specific emotions.</p>
+        </div>
+    </div>
+</body>
+</html> 

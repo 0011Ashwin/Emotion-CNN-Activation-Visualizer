@@ -8,14 +8,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from collections import OrderedDict
+from typing import Optional, Tuple, Dict, Any
 
 class EmotionCNN(nn.Module):
     """
     CNN model for emotion detection. 
     This is a sample model architecture that you can replace with your own pre-trained model.
     """
-    def __init__(self, num_classes=7):
-        super(EmotionCNN, self).__init__()
+    def __init__(self, num_classes: int = 7) -> None:
+        super().__init__()
         # Use a pre-trained ResNet as the base
         self.base_model = resnet18(pretrained=True)
         
@@ -24,7 +25,7 @@ class EmotionCNN(nn.Module):
         self.base_model.fc = nn.Linear(in_features, num_classes)
         
         # Store activations for visualization
-        self.activations = OrderedDict()
+        self.activations: OrderedDict[str, torch.Tensor] = OrderedDict()
         
         # Register hooks to capture activations
         self.hooks = []
@@ -36,32 +37,35 @@ class EmotionCNN(nn.Module):
                     module.register_forward_hook(self._get_activation(name))
                 )
     
-    def _get_activation(self, name):
-        def hook(module, input, output):
+    def _get_activation(self, name: str):
+        def hook(module: nn.Module, input: Any, output: torch.Tensor) -> None:
             self.activations[name] = output.detach()
         return hook
     
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.base_model(x)
     
-    def get_activations(self):
+    def get_activations(self) -> OrderedDict:
         return self.activations
 
 class ActivationMapVisualizer:
     """Class to handle the visualization of CNN activation maps"""
     
-    def __init__(self, model_path=None, img_size=(224, 224), device='cuda' if torch.cuda.is_available() else 'cpu'):
-        self.device = device
+    def __init__(self, model_path: Optional[str] = None, img_size: Tuple[int, int] = (224, 224), device: Optional[str] = None) -> None:
+        self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         self.img_size = img_size
         self.emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
         
         # Initialize model
-        self.model = EmotionCNN(num_classes=len(self.emotion_labels)).to(device)
+        self.model = EmotionCNN(num_classes=len(self.emotion_labels)).to(self.device)
         
         # Load pre-trained weights if provided
         if model_path and os.path.exists(model_path):
-            self.model.load_state_dict(torch.load(model_path, map_location=device))
-            print(f"Model loaded from {model_path}")
+            try:
+                self.model.load_state_dict(torch.load(model_path, map_location=self.device))
+                print(f"Model loaded from {model_path}")
+            except Exception as e:
+                print(f"Error loading model: {e}. Using ImageNet weights.")
         else:
             print("No model loaded. Using the model with pre-trained ImageNet weights.")
         
@@ -75,13 +79,16 @@ class ActivationMapVisualizer:
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
     
-    def preprocess_image(self, img_path):
+    def preprocess_image(self, img_path: str) -> Tuple[torch.Tensor, Image.Image]:
         """Preprocess an image for the model"""
-        img = Image.open(img_path).convert('RGB')
+        try:
+            img = Image.open(img_path).convert('RGB')
+        except Exception as e:
+            raise FileNotFoundError(f"Could not open image {img_path}: {e}")
         img_tensor = self.transform(img).unsqueeze(0).to(self.device)
         return img_tensor, img
     
-    def get_activation_maps(self, img_tensor):
+    def get_activation_maps(self, img_tensor: torch.Tensor) -> Tuple[OrderedDict, int]:
         """Get activation maps from the model for a given image tensor"""
         with torch.no_grad():
             pred = self.model(img_tensor)
@@ -89,7 +96,7 @@ class ActivationMapVisualizer:
             
         return self.model.get_activations(), predicted_class
     
-    def visualize_activation_maps(self, img_path, output_dir=None, num_filters=16, figsize=(15, 10)):
+    def visualize_activation_maps(self, img_path: str, output_dir: Optional[str] = None, num_filters: int = 16, figsize: Tuple[int, int] = (15, 10)) -> int:
         """
         Visualize activation maps for a given image
         
@@ -98,6 +105,8 @@ class ActivationMapVisualizer:
             output_dir: Directory to save visualization images (if None, just display)
             num_filters: Number of filters to visualize for each layer
             figsize: Size of the figure for matplotlib
+        Returns:
+            predicted_class: The predicted emotion class index
         """
         # Preprocess image
         img_tensor, original_img = self.preprocess_image(img_path)
@@ -169,10 +178,13 @@ class ActivationMapVisualizer:
         
         return predicted_class
     
-    def visualize_class_activation_map(self, img_path, output_dir=None):
+    def visualize_class_activation_map(self, img_path: str, output_dir: Optional[str] = None) -> Tuple[int, np.ndarray]:
         """
         Generate a Class Activation Map (CAM) to show which regions 
         of the image are most important for the classification
+        Returns:
+            predicted_class: The predicted emotion class index
+            overlay: The overlay image as a numpy array
         """
         # This is a simplified CAM implementation
         # For a full Grad-CAM implementation, more hooks and gradient tracking would be needed
@@ -191,8 +203,7 @@ class ActivationMapVisualizer:
                 break
         
         if last_conv_layer is None:
-            print("Could not find a convolutional layer")
-            return
+            raise RuntimeError("Could not find a convolutional layer")
         
         last_conv_act = activations[last_conv_layer].squeeze(0)
         

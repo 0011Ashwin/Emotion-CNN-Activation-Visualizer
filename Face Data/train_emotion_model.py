@@ -8,15 +8,16 @@ from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from typing import Optional, Tuple, Dict, Any
 
-# Model traning script for emotion recognition
+# Model training script for emotion recognition
 # Import the model architecture from our visualization script
 from visualize_activations import EmotionCNN
 
 class EmotionDataset(Dataset):
     """Dataset for emotion recognition from face images"""
     
-    def __init__(self, data_dir, transform=None):
+    def __init__(self, data_dir: str, transform: Optional[Any] = None) -> None:
         """
         Args:
             data_dir (string): Directory with emotion folders
@@ -37,23 +38,34 @@ class EmotionDataset(Dataset):
                     self.image_paths.append(os.path.join(emotion_dir, img_name))
                     self.labels.append(i)
     
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.image_paths)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
         img_path = self.image_paths[idx]
         label = self.labels[idx]
         
         # Load image and apply transform
-        img = Image.open(img_path).convert('RGB')
+        try:
+            img = Image.open(img_path).convert('RGB')
+        except Exception as e:
+            raise FileNotFoundError(f"Could not open image {img_path}: {e}")
         
         if self.transform:
             img = self.transform(img)
         
         return img, label
 
-def train_model(train_dir, val_dir=None, epochs=10, batch_size=32, learning_rate=0.001, 
-                save_dir='model', img_size=(224, 224), device=None):
+def train_model(
+    train_dir: str,
+    val_dir: Optional[str] = None,
+    epochs: int = 10,
+    batch_size: int = 32,
+    learning_rate: float = 0.001,
+    save_dir: str = 'model',
+    img_size: Tuple[int, int] = (224, 224),
+    device: Optional[str] = None
+) -> Tuple[nn.Module, Dict[str, list]]:
     """
     Train an emotion recognition model
     
@@ -239,7 +251,8 @@ def train_model(train_dir, val_dir=None, epochs=10, batch_size=32, learning_rate
     
     return model, history
 
-def main():
+def main() -> None:
+    """Example usage for training the model."""
     # Example usage
     train_dir = 'train'  # Changed from 'Face Data/train'
     val_dir = 'test'     # Changed from 'Face Data/test'
@@ -248,8 +261,8 @@ def main():
     model, history = train_model(
         train_dir=train_dir,
         val_dir=val_dir,
-        epochs=2,
-        batch_size=32,
+        epochs=20,
+        batch_size=16, # Reduced batch size for memory efficiency 32 -> 16
         learning_rate=0.001,
         save_dir='model'
     )

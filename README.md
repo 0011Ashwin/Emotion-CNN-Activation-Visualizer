@@ -2,7 +2,7 @@
 
 This application visualizes the activation maps of a CNN model for emotion detection, allowing you to see which parts of an image are important for the classification decision.
 
-## 🚀 What's New (2024 Upgrade)
+## 🚀 What's New (2025 Upgrade)
 
 - **Code Refactoring & Optimization:** Improved readability, modularity, and error handling across all main scripts. Type hints and docstrings throughout.
 - **UI/UX Enhancements:** Modern Streamlit interface with sidebar controls, layer selection, CAM/Grad-CAM toggle, and download options.

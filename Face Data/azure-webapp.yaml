@@ -1,0 +1,28 @@
+# Sample Azure Web App for Containers deployment YAML
+# Replace <YOUR-REGISTRY-NAME> and <YOUR-IMAGE-NAME> with your actual values
+
+resources:
+- type: Microsoft.Web/sites
+  apiVersion: 2022-03-01
+  name: <YOUR-WEBAPP-NAME>
+  location: <YOUR-REGION>
+  kind: app,linux
+  properties:
+    serverFarmId: <YOUR-APP-SERVICE-PLAN-ID>
+    siteConfig:
+      linuxFxVersion: "DOCKER|<YOUR-REGISTRY-NAME>.azurecr.io/<YOUR-IMAGE-NAME>:latest"
+      appSettings:
+        - name: WEBSITES_PORT
+          value: "8501"
+        - name: STREAMLIT_SERVER_HEADLESS
+          value: "true"
+        - name: STREAMLIT_SERVER_PORT
+          value: "8501"
+        - name: STREAMLIT_SERVER_ENABLECORS
+          value: "false"
+    httpsOnly: true
+
+# Notes:
+# - Build and push your Docker image to Azure Container Registry (ACR) first.
+# - Replace <YOUR-REGISTRY-NAME>, <YOUR-IMAGE-NAME>, <YOUR-WEBAPP-NAME>, <YOUR-REGION>, and <YOUR-APP-SERVICE-PLAN-ID>.
+# - You can deploy this YAML using Azure CLI or Azure Resource Manager. 

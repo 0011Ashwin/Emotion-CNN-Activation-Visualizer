@@ -1,0 +1,72 @@
+Azure Deployment Steps for Streamlit App using azure-webapp.yaml
+===============================================================
+
+Step 1: Build and Push Your Docker Image to Azure Container Registry (ACR)
+-------------------------------------------------------------------------
+
+1. Login to Azure:
+   az login
+
+2. Create a Resource Group (if you don't have one):
+   az group create --name <YOUR-RESOURCE-GROUP> --location <YOUR-REGION>
+
+3. Create an Azure Container Registry (ACR):
+   az acr create --resource-group <YOUR-RESOURCE-GROUP> --name <YOUR-REGISTRY-NAME> --sku Basic
+
+4. Login to your ACR:
+   az acr login --name <YOUR-REGISTRY-NAME>
+
+5. Build your Docker image and tag it for ACR:
+   docker build -t <YOUR-REGISTRY-NAME>.azurecr.io/<YOUR-IMAGE-NAME>:latest .
+
+6. Push your image to ACR:
+   docker push <YOUR-REGISTRY-NAME>.azurecr.io/<YOUR-IMAGE-NAME>:latest
+
+
+Step 2: Create an Azure App Service Plan
+----------------------------------------
+az appservice plan create --name <YOUR-APP-SERVICE-PLAN-ID> --resource-group <YOUR-RESOURCE-GROUP> --is-linux --sku B1
+
+
+Step 3: Edit azure-webapp.yaml
+------------------------------
+- Replace all placeholders:
+  - <YOUR-REGISTRY-NAME>
+  - <YOUR-IMAGE-NAME>
+  - <YOUR-WEBAPP-NAME>
+  - <YOUR-REGION>
+  - <YOUR-APP-SERVICE-PLAN-ID>
+
+
+Step 4: Deploy the Web App Using the YAML File
+----------------------------------------------
+1. Register the Microsoft.Web resource provider (if not already):
+   az provider register --namespace Microsoft.Web
+
+2. Deploy the YAML using Azure CLI:
+   az deployment group create --resource-group <YOUR-RESOURCE-GROUP> --template-file azure-webapp.yaml
+
+
+Step 5: Access Your Streamlit App
+---------------------------------
+- After deployment, go to the Azure Portal.
+- Find your Web App (<YOUR-WEBAPP-NAME>).
+- The app will be available at:
+  https://<YOUR-WEBAPP-NAME>.azurewebsites.net
+
+
+Summary of What Happens
+-----------------------
+- Azure pulls your Docker image from ACR.
+- The App Service runs your container, exposing port 8501.
+- Streamlit runs in headless mode and is accessible via the web.
+
+
+Troubleshooting
+---------------
+- Check the "Logs" section in the Azure Portal for your Web App if you encounter issues.
+- Make sure your ACR and App Service are in the same region for best performance.
+- Ensure your image is public or your App Service has permission to pull from your ACR.
+
+
+# End of Azure Deployment Steps 

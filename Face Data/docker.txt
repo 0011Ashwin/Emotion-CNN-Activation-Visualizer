@@ -1,0 +1,55 @@
+Docker Deployment Steps for Streamlit App
+========================================
+
+Step 1: Build the Docker Image
+------------------------------
+1. Open a terminal and navigate to the project directory (where the Dockerfile is located).
+2. Build the Docker image with a tag (e.g., emotion-cnn-app):
+   docker build -t emotion-cnn-app .
+
+
+Step 2: Run the Docker Container Locally
+----------------------------------------
+1. Run the container, mapping port 8501 (Streamlit default) to your local machine:
+   docker run -p 8501:8501 emotion-cnn-app
+2. Open your browser and go to:
+   http://localhost:8501
+
+
+Step 3: (Optional) Run in Detached Mode
+---------------------------------------
+- To run the container in the background:
+  docker run -d -p 8501:8501 emotion-cnn-app
+
+
+Step 4: (Optional) Pass Environment Variables
+---------------------------------------------
+- You can override Streamlit or app environment variables at runtime:
+  docker run -p 8501:8501 -e STREAMLIT_SERVER_PORT=8501 -e STREAMLIT_SERVER_HEADLESS=true emotion-cnn-app
+
+
+Step 5: (Optional) Build and Push to a Container Registry
+--------------------------------------------------------
+- Tag your image for a registry (e.g., Docker Hub or Azure Container Registry):
+  docker tag emotion-cnn-app <your-registry>/<your-image-name>:latest
+- Push the image:
+  docker push <your-registry>/<your-image-name>:latest
+
+
+Troubleshooting
+---------------
+- If you get an error about missing dependencies, make sure your requirements.txt is up to date.
+- If the app does not start, check the logs:
+  docker logs <container-id>
+- If you need to stop a running container:
+  docker ps  # Find the container ID
+  docker stop <container-id>
+- If you change the code, rebuild the image before running again.
+
+
+Summary
+-------
+- The Dockerfile sets up a production-ready environment for your Streamlit app.
+- You can run the app locally, or deploy it to any container platform (Azure, AWS, GCP, etc.) using the same image.
+
+# End of Docker Deployment Steps 

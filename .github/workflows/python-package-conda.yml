@@ -1,4 +1,4 @@
-name: Python application
+name: Python application (Conda)
 
 on:
   push:
@@ -12,18 +12,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v5
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v3
       with:
+        auto-update-conda: true
         python-version: '3.10'
-    - name: Install dependencies
+    - name: Create and activate environment
       run: |
-        python -m pip install --upgrade pip
-        pip install -r Face Data/requirements.txt
+        conda env create -f Face Data/environment.yml || conda env update -f Face Data/environment.yml
+        conda activate myenv
+      shell: bash -l {0}
     - name: Run tests
       run: |
         # Add your test command here, e.g. pytest or unittest
         echo "No tests specified"
+      shell: bash -l {0}
     - name: Build
       run: |
-        echo "Build step (customize as needed)" 
+        echo "Build step (customize as needed)"
+      shell: bash -l {0} 
